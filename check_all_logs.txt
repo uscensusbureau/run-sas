@@ -1,0 +1,45 @@
+#!/bin/ksh
+#  check_all_logs.ksh
+#
+#  This script is used to record a production directory's log checks for later QC and
+#  record keeping. check_all_logs is executed without any parameters, just call
+#     $ check_all_logs.ksh
+#  in the directory where the programs are located.
+#
+#  The script first deletes old output generated the same day (rename the old file to avoid
+#  the deletion). It then searches for all files with the .sas extension and runs the log
+#  check script for each one. All output is appended to a permanent file and the permissions
+#  are set so that the record is not writable.
+#
+#  June 2017 S. Elser
+
+   #  create date variable
+   today=$(date +"%Y%m%d")
+
+   #  remove output from the same day to avoid appending repeat output
+   rm -f log_check_output_$today.txt 2> /dev/null
+
+   echo    "**********************************************************************"
+   date
+   echo    "Checking all logs in current directory:"
+
+   #  list all files in current directory with the .log extension
+   #  -1 lists one at a time and -B skips '~ backup' files
+   for i in `ls -1B *.log`
+   do
+
+   #  this line strips the filename of its extension since sas_log_check requires the rootname only
+   rootname=${i%.*}
+
+   sas_log_check.ksh $rootname >> log_check_output_$today.txt
+
+   done
+
+   #  sets permissions to read only and assigns the correct group
+   chmod 550 log_check_output_$today.txt
+   chgrp sae log_check_output_$today.txt
+
+   echo    ""
+   echo    "Check complete, output saved in log_check_output_$today.txt"
+   echo    "**********************************************************************"
+

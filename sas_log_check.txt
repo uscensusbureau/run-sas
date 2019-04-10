@@ -1,0 +1,188 @@
+#!/bin/ksh
+#  sas_log_check.ksh
+#
+#  Purpose:  To perform a complete log check for signs of common problems. This script can run on its own
+#            on any SAS program that has been executed or can be called by other scripts.
+#
+#  Usage:
+#     Note:  KSH files MUST be EXECUTABLE
+#     Command line to run a single program
+#           sas_log_check.ksh myprogram.sas
+#           sas_log_check.ksh myprogram.sas > abc.txt
+#     Run Script
+#        same syntax as above just multiple calls from another .ksh
+#
+# History:
+#
+#    June 2014 - J. Posey - major help from Chris Boniface (See note at bottom)
+#                           Original Programming
+#    June 2017 - S. Elser - created a base script for log checking that can be called by other scripts
+#    July 2017 - S. Elser - added the rootname variable to allow parameters to have extensions
+#    Sept 2018 - S. Elser - documented additional checks and added a new one for FATAL errors, version is now 1.1
+#
+# Execution:
+#    Prints date of log file to record
+#    Runs a tail command so can see the runtime stats at bottom of .log
+#    Runs the SAEB Log Checker set of KSH code
+
+   #  this line strips the filename of its extension
+   rootname=${1%.*}
+
+   echo    "*********************************************"
+   echo    "Date and time of last run:   "
+   #  prints date of last modification rather than today's date since the log checker does not
+   #  do a new run of the program (today's date might not equal the log's date)
+   date     -r $rootname.log
+   echo    "*********************************************"
+   echo    "Bottom 10 lines of the log for $rootname.sas:"
+   tail     $rootname.log
+
+   echo    "*********************************************"
+   echo    "SAEB Log Checker Start  [Current Version: 1.1]"
+   echo    ""
+
+
+   for i in `ls -1 $rootname.log`
+   do
+
+      # note:  ERROR is capitalized and the -i switch is absent from the grep
+      grep ERROR: $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "SEVERE:   ERROR:                in $i" 
+         fi
+
+      # note:  R output begins every line with "Warning: R:" so that specific case needed to be ignored
+      # S. Elser: Also filtering out several Warnings created by user code or that cause unnecessary messages
+      grep -i warning: $i |                                      \
+         grep -iv "warning: r:" |                                \
+         grep -iv "%put warning:" |                              \
+         grep -iv "WARNING: Unable to copy SASUSER registry" |   \
+         grep -iv "Warning: The minimum data value" |            \
+         grep -iv "Warning: Limit set by ERRORS= option reached" > /dev/null
+         if [ $? = 0 ]; then
+            echo "SEVERE:   Warning:              in $i" 
+         fi
+
+      grep -i uninit $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "SEVERE:   Uninit                in $i"  
+         fi
+
+      grep -i converted $i | grep -iv "files will be automatically converted" > /dev/null
+         if [ $? = 0 ]; then
+            echo "LOW:      Converted             in $i" 
+         fi
+
+      grep -i truncate $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "SEVERE:     Truncate            in $i" 
+         fi
+
+      grep -i "Invalid argument" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Invalid argument      in $i" 
+         fi
+
+      grep -i "repeats of BY values" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "SEVERE:   Repeats of BY values  in $i" 
+         fi
+
+      ## past here are ones from Lauren via email 5/22/2014
+
+      grep -i "Character values" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "LOW:      Character values      in $i" 
+         fi
+
+      grep -i "End of line" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     End of line           in $i" 
+         fi
+
+      grep -i "does not exist" $i | grep -iv "NOTE: BASE data set does not exist."> /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     does not exist        in $i" 
+         fi
+
+      grep -i "Lost card" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Lost card             in $i" 
+         fi
+
+      grep -i "Missing values" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Missing values        in $i" 
+         fi
+
+      grep -i "Multiple lengths" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Multiple lengths      in $i" 
+         fi
+
+      grep -i "No observations" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "LOW:      No observations       in $i" 
+         fi
+
+      grep -i "Not resolved" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Not resolved          in $i" 
+         fi
+
+      grep -i " 0 observations" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "LOW:      0 observations        in $i" 
+            echo "          MIGHT BE OK IF TRAPPING ERRORS IN A DATASET"
+         fi
+
+      # these are the ones SAEB found
+
+      grep -i "Invalid numeric data" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Invalid numeric data  in $i" 
+         fi
+
+      # added 08/2017 by J. Posey
+      grep -i "Invalid data" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Invalid data          in $i" 
+         fi
+
+      # added 09/2017 by S. Elser for custom error messages
+      grep -i "SAEB NOTE:" $i > /dev/null
+         if [ $? = 0 ]; then
+            echo "HIGH:     Check for SAEB NOTE   in $i" 
+         fi
+
+	  # discovered 09/2018 by J. Posey and added by S. Elser
+	  grep -i "FATAL:" $i > /dev/null
+		 if [ $? = 0 ]; then
+		    echo "SEVERE:   Fatal execution error in $i"
+		 fi
+
+      # added 06/2017 by S. Elser for checking R code executed in SAS
+      if [[ -n "$2" && $2 = "rlang" ]]; then
+         # The following checks are only for programs with R code and only searches the lines
+         # that begin in "WARNING: R:". R ERRORS are caught naturally by the SAS ERROR message.
+         grep -i "warning: r:" $i | grep -i "error" > /dev/null
+            if [ $? = 0 ]; then
+               echo "HIGH: (R) Error                 in $i" 
+            fi
+      fi
+
+   done
+
+   echo    ""
+   echo    "SAEB Log Checker Complete for $rootname.sas"
+   echo    "**********************************************************************"
+
+# The bulk of the log checking came from Chris Boniface program 
+# recd email 3/18/2014 jmp
+# ERROR is capitalized to allow program comments and varnames to have error 
+# contained within
+# other checks use -i for ignore case
+# Difference than as Chris sent me:  
+#     I removed  >> ${LOGFILE} from each of the echo to send to screen 
+#     (then we capture)
+#

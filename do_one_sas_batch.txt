@@ -1,0 +1,61 @@
+#!/bin/ksh
+#  do_one_sas_batch.ksh
+#
+#  Purpose:  To run one SAS program in batch and then do automated
+#            validation of the log.
+#
+#  Usage:
+#     Note:  KSH files MUST be EXECUTABLE
+#     Command line to run a single program
+#           do_one_sas_batch.ksh myprogram.sas
+#           do_one_sas_batch.ksh myprogram.sas > abc.txt
+#           do_one_sas_batch.ksh myprogram.sas -myoption
+#     Run Script
+#        same syntax as above just multiple calls from another .ksh
+#
+# History:
+#
+#    June 2014 - J. Posey - major help from Chris Boniface (See note at bottom)
+#                           Original Programming
+#    June 2017 - S. Elser - moved the log checking procedure to a separate script, this script
+#                           calls that one so that the log checker can be maintained universally
+#    July 2017 - S. Elser - added the rootname variable to allow parameters to have extensions
+#    Sept 2017 - S. Elser - added a check for a non-zero SAS exit code and sends an error code
+#
+# Execution:
+#    Runs the sas program
+#    Calls the sas_log_check.ksh
+
+   #  this line strips the filename of its extension
+   rootname=${1%.*}
+
+   export SASEXE=/usr/local/bin/sas
+
+   echo    "**********************************************************************"
+   #  sas_log_check also print the date but this will give a record of the start time
+   date
+   echo    "$rootname.sas starting..."
+
+   #  runs sas program without options if second parameter is null
+   if [ -z "$2" ]; then
+      $SASEXE $rootname.sas
+      status=$?
+   fi
+
+   #  runs sas program with the options provided in the second parameter
+   if [ -n "$2" ]; then
+      $SASEXE $2 $rootname.sas
+      status=$?
+   fi
+
+   sas_log_check.ksh $rootname
+
+   if [ $status != 0 ]; then
+      echo "ERROR occurred, halting execution..."
+      exit 1
+   fi
+
+
+
+
+
