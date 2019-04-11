@@ -1,32 +1,15 @@
-# SOP 099 – Usage Korn .KSH Linux Scripts and Toolbox
+# Linux scripts for running SAS
 
 ## Purpose
 
-This documentation provides an overview of the usage of Korn shell scripts to automate SAEB processing on the SAE server and the toolbox script repository to automate various SAS functions and to standardize log checks.
+This documentation provides an overview of the usage of Korn shell scripts to automate various SAS functions and to standardize log checks.
 
 ## When
 
-KSH scripts are useful for running several related SAS programs from start to finish.  This ensures that the set of programs are run in the proper sequence.  This is the preferable method for ALL SAEB production programs.
-
-## Who
-
-| **Level** | **Staff – Role** |
-| --- | --- |
-| Familiar | SAEB General Staff, SALE ADC |
-| Working | SAEB Branch Chief, ALL SAEB Staff that run production programs |
-| Expert | SAEB Dissemination SME/Team Lead, SAEB SAHIE/SAIPE Production Team Lead(s) |
-
-## Scope of Work
-
-This SOP covers ALL SAEB production programs (SAS, R, and C)
-
-The usage of a driver .ksh files **is suggested** but not mandatory.
-
-The usage of the [`do_one_sas_batch`](do_one_sas_batch) script for SAS programs **is required**.
+KSH scripts are useful for running several related SAS programs from start to finish.  This ensures that the set of programs are run in the proper sequence.
 
 ## What (Procedure)
-
-All SAEB staff are responsible for the best set of 'problematic' words.  But since the [`do_one_sas_batch`](do_one_sas_batch) file is under configuration management (CM), an SAEB Issue must be initiated to add/subtract target phrases and/or change their severity level.
+The usage of a driver .ksh files **is suggested** but not mandatory. The usage of the [`do_one_sas_batch`](do_one_sas_batch) script for SAS programs **is required**.
 
 Access to the toolbox from any terminal is provided by editing the user's `.bashrc` file **once** by running the following command:
 
@@ -58,7 +41,7 @@ Some details to note:
 
 - The first line `#!/bin/ksh` is required – it indicates that the file is a Korn Shell Script.
 - Comments are created using the `#` symbol (except as seen on the first line).
-- [`do_one_sas_batch`](do_one_sas_batch) is a SAEB custom written Korn Shell program that runs the program but then checks the `.log` for about 15 problematic phrases.
+- [`do_one_sas_batch`](do_one_sas_batch) is a custom written Korn Shell program that runs the program but then checks the `.log` for about 15 problematic phrases.
 - [`check_all_logs`](check_all_logs) checks the log files one more time and saves the output for record keeping.
 - A `.ksh` file must have 'eXecution' privileges to run.  See `chmod` command documentation.
 
@@ -66,7 +49,7 @@ Some details to note:
 
 This Korn shell script can either be run from another .ksh script or run directly from the command line.  Its main advantage is that it automatically checks the `.log` file for known SAS problems – EACH TIME.
 
-SAEB worked with other branches to implement what we felt is the best set of things to check. This script is called by various other "flavors" of SAS scripts so that only one version needs to be maintained. The internal workings of the script are out of scope for this document but the following are the items currently (July 2015) checked:
+The SAEB team worked with other branches to implement what we felt is the best set of things to check. This script is called by various other "flavors" of SAS scripts so that only one version needs to be maintained. The internal workings of the script are out of scope for this document but the following are the items currently (July 2015) checked:
 
 - **SEVERE Checks - Must be corrected** – if not possible **Branch Chief Approval required**.
 - ERROR: an error, typically means the program did not complete
@@ -86,9 +69,7 @@ if not possible note and get peer reviewer approval.
 - Missing values
 - Multiple lengths
 - Not resolved
-- Invalid numeric data
-
-SAEB NOTE:        Custom flag that will show up in log checker, must be written into program by SAE
+- Invalid numeric data - Custom flag that will show up in log checker, must be written into program
 
 ### **LOW Items Checked**
 
@@ -104,7 +85,7 @@ SAEB NOTE:        Custom flag that will show up in log checker, must be written 
 - NOTE: Appending `WORK.C_RECODE_POV_SE` to `WORK.C_APPEND_POV_SE`.
 - NOTE: BASE data set does not exist. DATA file is being copied to BASE file.
 
-## VIII. Other toolbox scripts:
+## Other toolbox scripts
 
 Available scripts and a short description of each, see the script header for details:
 
