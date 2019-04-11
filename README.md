@@ -111,8 +111,4 @@ Available scripts and a short description of each, see the script header for det
 
 - check\_all\_logs.ksh        - runs the log\_check for every SAS program in the current directory and saves output to a permanent file
 - do\_one\_sas\_batch.ksh      - used to execute the SAS program in batch mode and then check the log for any problems, SAS command line options can be passed after the program name
-- example\_driver.ksh        - not a functional script but an example of a script that runs multiple commands in a specific order
-- run\_sas\_with\_memsize.ksh  - executes SAS with memsize set to MAX unless user specifies the size
-- run\_sas\_with\_r.ksh        - executes SAS using the &quot;rlang&quot; option so that R code can be used
-- sae\_permissions.ksh       - secures all files within current or specified directory
 - sas\_log\_check.ksh         - searches for various messages in the SAS log that indicate a problem
