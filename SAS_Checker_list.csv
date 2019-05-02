@@ -1,16 +1,14 @@
 SEVERITY,PHRASE,IGNORE,NOTES
-SEVERE, truncate,,
+SEVERE,truncate,,
 SEVERE,ERROR:,,
 SEVERE,FATAL:,,
 SEVERE,Repeats of BY values,,
-SEVERE,WARNING:, ,
-SEVERE,WARNING:,%put warning:,
+SEVERE,Uninit,,uninitialized
+SEVERE,WARNING:,%put Warning:,
 SEVERE,WARNING:,Warning: Limit set by ERRORS= option reached,
-SEVERE,WARNING:,warning: r:,For R program language notes.
+SEVERE,WARNING:,Warning: R:,For R program language notes.
 SEVERE,WARNING:,Warning: The minimum data value,
-SEVERE,WARNING:,Warning: The minimum data value,
-SEVERE,WARNING:,WARNING: Unable to copy SASUSER registry,
-HIGH,does not exist, ,
+SEVERE,WARNING:,Warning: Unable to copy SASUSER registry,
 HIGH,does not exist,NOTE: BASE data set does not exist,
 HIGH,End of line,,
 HIGH,Invalid argument,,
@@ -20,9 +18,12 @@ HIGH,Lost card,,
 HIGH,Missing values,,
 HIGH,Multiple lengths,,
 HIGH,Not resolved,,
-HIGH,SAEB NOTE:,,custom flag
+HIGH,Custom note:,,custom flag
 LOW, 0 observations,,leading space required
-LOW, converted $i , ,
-LOW, converted $i ,files will be automatically converted,
+LOW,Converted,files will be automatically converted,
 LOW,Character values,,
 LOW,No observations,,
+LOW,_error_,,
+LOW,division by zero,,
+LOW,a missing value,,
+LOW,not permitted,,
