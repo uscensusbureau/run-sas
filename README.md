@@ -12,7 +12,7 @@ echo 'export PATH=$PATH:/your_path' >> ~/.bashrc
 
 Users may need to log out and back in to the server for this change to take effect. Once ready, a SAS program can be executed in batch mode:
 
-```batch
+```sh
 do_one_sas_batch.ksh my_program.sas
 ```
 
@@ -87,7 +87,7 @@ Should be corrected, should be 'rare'
 - Character values
 - No observations: This might be okay – dataset of bad records should empty.
 - 0 observations: Same as No observations
-- _Error_
+- \_Error\_
 - Division by zero
 - A missing value
 - Not permitted
