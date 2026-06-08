@@ -2,6 +2,13 @@
 
 This repository contains Korn shell scripts used to automate various [SAS](https://www.sas.com/) functions and to standardize log checks.
 
+## Status
+ **This repository has been archived and is no longer maintained.**
+ 
+ The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+ 
+ It should not be used in production systems.
+
 ## Setup
 
 The shell scripts need the extension `.ksh` and should be stored in a central location accessible by all users. By doing so, only one copy of each script needs to be maintained. Then, access to the scripts from any terminal is provided by editing the user's `.bashrc` file **once** by running the following command:
